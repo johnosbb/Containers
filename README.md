@@ -217,3 +217,56 @@ mysql.			600	IN	A	172.18.0.2
 
 ```
 The network alias we specified when creating the mysql container allows other containers to connect to it. (--network-alias mysql) [For exampe see here](https://docs.docker.com/get-started/07_multi_container/)
+
+
+## Using Compose
+
+
+
+We can script a number of containers by using compose.
+
+We first create a yaml file that defines the stack
+
+```yml
+services:
+  app:
+    image: node:18-alpine
+    command: sh -c "yarn install && yarn run dev"
+    ports:
+      - 127.0.0.1:3000:3000
+    working_dir: /app
+    volumes:
+      - ./:/app
+    environment:
+      MYSQL_HOST: mysql
+      MYSQL_USER: root
+      MYSQL_PASSWORD: secret
+      MYSQL_DB: todos
+
+  mysql:
+    image: mysql:8.0
+    volumes:
+      - todo-mysql-data:/var/lib/mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: secret
+      MYSQL_DATABASE: todos
+
+volumes:
+  todo-mysql-data:
+```
+We can then launch this with:
+
+```bash
+docker compose up -d
+[+] Running 5/5
+ ✔ app 4 layers [⣿⣿⣿⣿]      0B/0B      Pulled                              2.4s 
+   ✔ 7264a8db6415 Already exists                                           0.0s 
+   ✔ 751194035c36 Already exists                                           0.0s 
+   ✔ eff5dce73b38 Already exists                                           0.0s 
+   ✔ c8ce5be43019 Already exists                                           0.0s 
+[+] Running 4/4
+ ✔ Network getting-started-app_default           Created                   0.1s 
+ ✔ Volume "getting-started-app_todo-mysql-data"  Created                   0.0s 
+ ✔ Container getting-started-app-mysql-1         Started                   0.6s 
+ ✔ Container getting-started-app-app-1           Started
+```
