@@ -9,6 +9,13 @@ __List containers__
 ```bash
 docker ps
 ```
+
+__Observing Logs from a Container__
+
+```bash
+docker logs <container-id>
+```
+
 __Stopping and Removing a Container__
 
 ```bash
@@ -65,4 +72,12 @@ docker volume inspect todo-db #
 ]
 
 # We can view the container contents at: /var/lib/docker/volumes/todo-db/_data
+```
+
+__Bind_Mounts__
+
+With a bind mount we can specify a directory on the host that the container can access. The 'target' option spedifies where the host directory will be mounted in the container.
+
+```bash
+docker run -it --mount type=bind,src="$(pwd)",target=/src ubuntu bash
 ```
