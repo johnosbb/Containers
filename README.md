@@ -270,3 +270,16 @@ docker compose up -d
  ✔ Container getting-started-app-mysql-1         Started                   0.6s 
  ✔ Container getting-started-app-app-1           Started
 ```
+We can check the startup with:
+
+```bash
+docker compose logs -f
+```
+
+We can tear down this stack with:
+
+```bash
+docker compose down
+```
+
+[Docker Compose CLI Reference](https://docs.docker.com/compose/reference/)
