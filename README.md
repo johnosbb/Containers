@@ -88,11 +88,13 @@ We can create a network for a container with the command 'docker network'
 ```bash
 docker network create container_network
 ```
-We can launch a container to attach to a particular network:
+We can launch a container to attach to a particular network, in this instance a mySQL server instance:
 
 ```bash
 docker run -d --network container_network --network-alias mysql -v todo-mysql-data:/var/lib/mysql  -e MYSQL_ROOT_PASSWORD=secret -e MYSQL_DATABASE=todos    mysql:8.0
 ```
+
+Docker recognizes you want to use a named volume (/var/lib/mysql) and creates one automatically for you.
 
 We can inspect the network with
 
@@ -142,7 +144,76 @@ docket network inspect container_network
 
 ```
 
+We can connect to this instance with 
+
+```bash
+docker exec -it <mysql-container-id> mysql -u root -p
+```
+
+```bash
+docker exec -it 22701baec940 mysql -u root -p
+Enter password: 
+Welcome to the MySQL monitor.  Commands end with ; or \g.
+Your MySQL connection id is 8
+Server version: 8.0.34 MySQL Community Server - GPL
+
+Copyright (c) 2000, 2023, Oracle and/or its affiliates.
+
+Oracle is a registered trademark of Oracle Corporation and/or its
+affiliates. Other names may be trademarks of their respective
+owners.
+
+Type 'help;' or '\h' for help. Type '\c' to clear the current input statement.
+
+mysql> 
+
+```
+
+Remember that each container has its own IP address.
+
+### Trouble Shooting Container Networks
+
+The container nicolaka/netshoot ships with a lot of tools that are useful for troubleshooting or debugging networking issues.
+
+```bash
+docker run -it --network container_network nicolaka/netshoot
+```
+
+```bash
+                    dP            dP                           dP   
+                    88            88                           88   
+88d888b. .d8888b. d8888P .d8888b. 88d888b. .d8888b. .d8888b. d8888P 
+88'  `88 88ooood8   88   Y8ooooo. 88'  `88 88'  `88 88'  `88   88   
+88    88 88.  ...   88         88 88    88 88.  .88 88.  .88   88   
+dP    dP `88888P'   dP   `88888P' dP    dP `88888P' `88888P'   dP   
+                                                                    
+Welcome to Netshoot! (github.com/nicolaka/netshoot)
+Version: 0.11
+
+```
+
+We can then use commands like dif to find the ip address of other containers.
+
+```bash
+dig mysql
+
+; <<>> DiG 9.18.13 <<>> mysql
+;; global options: +cmd
+;; Got answer:
+;; ->>HEADER<<- opcode: QUERY, status: NOERROR, id: 33492
+;; flags: qr rd ra; QUERY: 1, ANSWER: 1, AUTHORITY: 0, ADDITIONAL: 0
+
+;; QUESTION SECTION:
+;mysql.				IN	A
+
+;; ANSWER SECTION:
+mysql.			600	IN	A	172.18.0.2
+
+;; Query time: 3 msec
+;; SERVER: 127.0.0.11#53(127.0.0.11) (UDP)
+;; WHEN: Wed Aug 23 15:26:52 UTC 2023
+;; MSG SIZE  rcvd: 44
 
 
-
-
+```
+The network alias we specified when creating the mysql container allows other containers to connect to it. (--network-alias mysql) [For exampe see here](https://docs.docker.com/get-started/07_multi_container/)
