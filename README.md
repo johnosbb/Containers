@@ -43,6 +43,12 @@ __connect to Running Container and execure a command__
 docker exec <container-id> <your bash command>
 ```
 
+__connect to Container shell__
+
+```bash
+docker exec -it <container-id> /bin/bash
+```
+
 __Create a Volume__
 
 ```bash
